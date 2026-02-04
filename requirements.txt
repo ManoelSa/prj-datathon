@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+pandas
+numpy
+scikit-learn
+joblib
+openpyxl
+pydantic
+httpx
+pytest
+prometheus_client
+PyJWT
+python-multipart
+python-dotenv

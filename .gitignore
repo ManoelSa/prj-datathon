@@ -1,0 +1,27 @@
+# Python internals
+__pycache__/
+*.py[cod]
+
+# Ambientes virtuais e variáveis de ambiente
+.env
+venv/
+.venv/
+
+# IDEs
+.vscode/
+.idea/
+
+# Logs e Arquivos Temporários
+*.log
+
+# Scripts Python na raiz
+/*.py
+
+# Coverage reports
+.coverage
+htmlcov/
+coverage.xml
+
+# Arquivos de dados e modelos
+# *.pkl
+# *.joblib
