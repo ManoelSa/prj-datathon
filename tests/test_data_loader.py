@@ -22,7 +22,7 @@ def mock_excel_file(tmp_path):
     return str(file_path)
 
 def test_load_data_success(mock_excel_file):
-    """Testa leitura feliz"""
+    """Testa leitura Funcional"""
     data_dict = load_data(mock_excel_file)
     
     assert 2022 in data_dict

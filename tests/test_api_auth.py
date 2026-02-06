@@ -45,19 +45,16 @@ def test_predict_with_token():
     # 2. Predict com token
     headers = {"Authorization": f"Bearer {token}"}
     payload = {
-        "COD_ALUNO": 12345,
-        "COD_TURMA": 67890,
-        "IAA_2022": 7.5,
-        "IAA_2023": 8.0,
-        "IPS_2022": 6.5,
-        "IPS_2023": 7.0,
-        "IDA_2022": 8.5,
-        "IDA_2023": 9.0
+        "IAA": 5.5,
+        "IEG": 6.2,
+        "IPS": 7.0,
+        "IDA": 8.0,
+        "IPP": 4.5,
+        "IPV": 6.1,
+        "IAN": 5.0,
+        "INDE": 6.5,
+        "Defasagem": 0.0
     }
     response = client.post("/predict", json=payload, headers=headers)
-    
-    # Verifica sucesso (pode ser 200 ou 503 se modelo nao carregado, mas nao 401)
-    # Se o modelo nao carregar no teste (pois state.MODEL pode ser None se nao rodar lifespan), validamos o auth
-    # Para garantir o teste completo, podemos mockar o state.MODEL ou aceitar 503 como "auth ok"
     
     assert response.status_code in [200, 503]
