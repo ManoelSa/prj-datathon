@@ -91,7 +91,12 @@ async def prometheus_middleware(request: Request, call_next):
 # --- Rotas ---
 app.include_router(prediction_router)
 
-@app.post("/token", response_model=Token, tags=["Autenticação"])
+@app.post("/token", 
+    response_model=Token, 
+    tags=["Autenticação"],
+    summary="Login e Obtenção de Token",
+    description="Autentica o usuário (username/password) e retorna um token de acesso JWT (Bearer Token) válido por 30 minutos."
+)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = await authenticate_user(form_data.username, form_data.password)
     if not user:
@@ -106,12 +111,20 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.get("/", tags=["Saúde"])
+@app.get("/", 
+    tags=["Saúde"],
+    summary="Verificar Status da API",
+    description="Retorna o status operacional da API e indica se o modelo de ML foi carregado corretamente."
+)
 def home():
     model_status = "Carregado" if state.MODEL else "Não Carregado"
     return {"message": "API de Previsão de Risco está Online", "model_status": model_status}
 
-@app.get("/metrics", tags=["Monitoramento"])
+@app.get("/metrics", 
+    tags=["Monitoramento"],
+    summary="Métricas Prometheus",
+    description="Exposição de métricas técnicas e de negócio (latência, total de requests) para coleta pelo Prometheus."
+)
 def metrics():
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 

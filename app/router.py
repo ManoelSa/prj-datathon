@@ -6,10 +6,27 @@ from app.schemas import PredictionInput, PredictionOutput
 
 router = APIRouter()
 
-@router.post("/predict", response_model=PredictionOutput, dependencies=[Depends(get_current_user)])
+@router.post("/predict", 
+    response_model=PredictionOutput, 
+    dependencies=[Depends(get_current_user)],
+    tags=["Predição"],
+    summary="Previsão de Risco Acadêmico"
+)
 def predict(data: PredictionInput):
     """
-    Recebe os dados de entrada e retorna a previsão de risco.
+    Processa indicadores educacionais (IAA, IEG, IPS, etc.) para calcular a probabilidade de risco de evasão do aluno.
+
+    Endpoint para inferência do modelo de Machine Learning.
+    
+    - **IAA**: Índice de Autoavaliação da Aprendizagem
+    - **IEG**: Índice de Engajamento Geral
+    - **IPS**: Índice Psicossocial
+    - **IDA**: Índice de Dificuldade de Aprendizagem
+    - **IPP**: Índice de Prática Pedagógica
+    - **PV**: Índice de Ponto de Virada
+    - **IAN**: Índice de Adequação de Nível
+    - **INDE**: Índice de Desenvolvimento Educacional
+    - **Defasagem**: Nível de defasagem escolar
     """
     if state.MODEL is None:
         raise HTTPException(status_code=503, detail="Modelo não carregado")
