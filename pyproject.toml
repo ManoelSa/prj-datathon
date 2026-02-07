@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "risk_model"
+version = "0.1.0"
+description = "Pacote de modelo de risco"
+authors = [
+    {name = "Manoel Sa"},
+]
+dependencies = [
+    "pandas==3.0.0",
+    "scikit-learn==1.8.0",
+    "joblib==1.5.3",
+    "numpy==2.4.2",
+    "openpyxl==3.1.5",
+]
+requires-python = ">=3.12"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+namespaces = false

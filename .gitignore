@@ -25,3 +25,4 @@ coverage.xml
 # Arquivos de dados e modelos
 # *.pkl
 # *.joblib
+*.egg-info/

@@ -17,12 +17,17 @@ COPY requirements.txt .
 # Instala dependências Python
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copia o restante da aplicação
-# Incluímos src/ porque o carregamento de pickle geralmente requer disponibilidade de módulos
-COPY app/ ./app/
+# Copia o código fonte e configura o pacote
 COPY src/ ./src/
-# Copia .env se desejar embutido, OU gerencie via volumes/vars de ambiente. 
-# Para simplicidade nesta demo, copiamos se existir, mas em prod segredos devem ser injetados.
+COPY pyproject.toml .
+
+# Instala o pacote 'src' no ambiente Python do container
+RUN pip install .
+
+# Copia o restante da aplicação (API)
+COPY app/ ./app/
+
+# Copia .env se desejar (opcional/cuidado com segredos)
 COPY .env .
 
 # Expõe a porta da API
