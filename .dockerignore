@@ -1,0 +1,24 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.git/
+.gitignore
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+
+# Data files (model fits in image, but raw xlsx is large/not needed for prod)
+*.xlsx
+*.csv
+notebooks/
+verify_api.py
+verify_auth_manual.py
+train_xgboost.py
+Datathon - Machine Learning Engineering.pdf
+Dicionário Dados Datathon.pdf
