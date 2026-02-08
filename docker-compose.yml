@@ -1,0 +1,14 @@
+services:
+  api:
+    image: api-modelo-risco:latest # Nome da imagem
+    container_name: app-modelo-risco # Nome do container
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app
+      - ./src:/app/src
+      - ./models:/app/models # Mapper models se necessário persistência externa
+    env_file:
+      - .env
+    restart: always
