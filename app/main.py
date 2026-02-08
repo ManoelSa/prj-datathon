@@ -10,11 +10,6 @@ from datetime import timedelta
 from starlette.responses import Response
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST, Counter, Histogram
 
-# Adiciona a raiz do projeto ao sys.path para permitir o carregamento de módulos src do pickle
-# PROJECT_ROOT = Path(__file__).resolve().parent.parent
-# if str(PROJECT_ROOT) not in sys.path:
-#     sys.path.append(str(PROJECT_ROOT))
-
 # Importações após atualização do sys.path
 from app import state
 from app.router import router as prediction_router
