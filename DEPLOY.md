@@ -65,6 +65,11 @@ O [Render](https://render.com) é uma plataforma de nuvem que suporta deploy nat
    O Render fornecerá uma URL pública (ex: `https://risk-model-api.onrender.com`).
    - Acesse a documentação em: `https://<SEU-APP>.onrender.com/docs`
 
+7. **Atualizações Automáticas (CD)**:
+   - Por padrão, o Render monitora a branch `main`.
+   - **Sim**, qualquer `git push` para a `main` disparará automaticamente um novo build e deploy da sua aplicação.
+   - Você pode desativar isso nas configurações do serviço ("Auto Deploy: No") se preferir controle manual.
+
 ---
 
 ## Estrutura de Arquivos Relevante para Deploy
