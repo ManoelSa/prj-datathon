@@ -8,9 +8,6 @@ ENV PYTHONUNBUFFERED=1
 # Define o diretório de trabalho
 WORKDIR /app
 
-# Instala dependências do sistema se necessário (nenhuma estritamente necessária para slim com wheels, mas boa prática limpar)
-# RUN apt-get update && apt-get install -y --no-install-recommends gcc && rm -rf /var/lib/apt/lists/*
-
 # Copia requirements primeiro para aproveitar o cache do Docker
 COPY requirements.txt .
 
@@ -26,9 +23,6 @@ RUN pip install .
 
 # Copia o restante da aplicação (API)
 COPY app/ ./app/
-
-# Copia .env se desejar (opcional/cuidado com segredos)
-COPY .env .
 
 # Expõe a porta da API
 EXPOSE 8000

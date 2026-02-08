@@ -22,7 +22,5 @@ venv/
 htmlcov/
 coverage.xml
 
-# Arquivos de dados e modelos
-# *.pkl
-# *.joblib
+# Outros arquivos
 *.egg-info/
