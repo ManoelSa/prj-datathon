@@ -4,8 +4,6 @@ import pandas as pd
 import os
 from dotenv import load_dotenv
 
-# Carrega variáveis de ambiente (busca recursivamente)
-# Atualizado para funcionar dentro da pasta dashboard/
 from dotenv import find_dotenv
 load_dotenv(find_dotenv())
 
