@@ -1,4 +1,41 @@
-# Guia de Deploy
+# 🎓 Sistema de Alerta Preventivo (Modelo de Risco Acadêmico)
+
+Este projeto implementa uma solução completa de Machine Learning para predição de risco de evasão escolar. A arquitetura é composta por um pipeline de treinamento robusto, uma API escalável e um dashboard interativo para consumo dos dados.
+
+---
+
+## 🚀 Funcionalidades
+
+- **Pipeline de Treinamento Automatizado**:
+  - Engenharia de features temporais.
+  - Pré-processamento e limpeza de dados automatizados.
+  - Treinamento com RandomForest e balanceamento de classes.
+  - Serialização segura do modelo (`joblib`).
+
+- **API RESTful (FastAPI)**:
+  - Documentada via Swagger UI.
+  - Autenticação JWT (Bearer Token).
+  - Monitoramento de métricas via Prometheus.
+  - Containerizada com Docker.
+
+- **Dashboard Interativo (Streamlit)**:
+  - Interface amigável para inputs de indicadores pedagógicos.
+  - Login integrado e gestão de sessão.
+  - Visualização clara do risco e probabilidade.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Linguagem**: Python 3.12
+- **ML & Dados**: Scikit-Learn, Pandas, NumPy
+- **API**: FastAPI, Uvicorn, Pydantic
+- **Frontend**: Streamlit
+- **Infraestrutura**: Docker, Docker Compose
+- **Testes**: Pytest, Pytest-cov
+
+---
+
 
 Este documento descreve como realizar o deploy da API de Modelo de Risco tanto localmente quanto na nuvem (Render).
 
@@ -74,6 +111,29 @@ O [Render](https://render.com) é uma plataforma de nuvem que suporta deploy nat
      - `Dockerfile`
      - `requirements.txt`
    - Assim, commits que alteram apenas `README.md` ou `notebooks/` **não** dispararão um novo deploy.
+
+---
+
+## 3. Deploy do Dashboard (Streamlit Cloud)
+
+O Dashboard `dashboard/app.py` pode ser hospedado gratuitamente no [Streamlit Community Cloud](https://streamlit.io/cloud).
+
+### Passos
+1. **Login**: Acesse com sua conta GitHub.
+2. **Novo App**: Clique em "New app".
+3. **Repositório**: Selecione este repositório (`prj-datathon`).
+4. **Configurações**:
+   - **Branch**: `main`
+   - **Main file path**: `dashboard/app.py`
+5. **Secrets (Variáveis de Ambiente)**:
+   - Vá em "Advanced Settings" > "Secrets".
+   - Adicione a URL da sua API hospedada no Render:
+     ```toml
+     API_URL = "https://risk-model-api.onrender.com"
+     ```
+   - O código do dashboard já está preparado para ler essa variável.
+6. **Deploy**: Clique em "Deploy!".
+
 
 
 ---
