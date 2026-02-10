@@ -22,6 +22,7 @@ Este projeto implementa uma solução completa de Machine Learning para prediç�
   - Interface amigável para inputs de indicadores pedagógicos.
   - Login integrado e gestão de sessão.
   - Visualização clara do risco e probabilidade.
+  - **Monitoramento de Data Drift**: Comparação de distribuições Treino vs Produção.
 
 ---
 
