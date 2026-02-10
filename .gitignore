@@ -10,6 +10,7 @@ venv/
 # IDEs
 .vscode/
 .idea/
+.devcontainer/
 
 # Logs e Arquivos Temporários
 *.log

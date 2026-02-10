@@ -22,4 +22,4 @@ verify_auth_manual.py
 train_xgboost.py
 Datathon - Machine Learning Engineering.pdf
 Dicionário Dados Datathon.pdf
-*.egg-info/
+*.egg-info/.devcontainer
