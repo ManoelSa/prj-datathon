@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 import os
 from dotenv import load_dotenv
+from scipy.stats import ks_2samp
 
 from dotenv import find_dotenv
 load_dotenv(find_dotenv())
@@ -222,9 +223,7 @@ elif page == "Monitoramento de Drift":
                 st.write("**Atual**")
                 st.write(df_curr[feature].describe())
                 
-            # Alerta de Drift via Teste KS (Kolmogorov-Smirnov)
-            from scipy.stats import ks_2samp
-            
+            # Alerta de Drift via Teste KS (Kolmogorov-Smirnov)           
             # Remove nulos e converte para numérico se necessário
             sample_ref = pd.to_numeric(df_ref[feature], errors='coerce').dropna()
             sample_curr = pd.to_numeric(df_curr[feature], errors='coerce').dropna()
