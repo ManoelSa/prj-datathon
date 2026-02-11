@@ -17,3 +17,5 @@ FEATURE_COLS = ['IAA', 'IEG', 'IPS', 'IDA', 'IPP', 'IPV', 'IAN', 'INDE', 'Defasa
 
 # Random State
 RANDOM_STATE = 42
+
+#Teste CI
