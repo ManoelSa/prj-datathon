@@ -36,4 +36,4 @@ jobs:
         APP_PASS: "test_pass"
         PYTHONPATH: "."
       run: |
-        pytest tests/ --cov=src --cov=app --cov-report=xml
+        python -m pytest --cov=src --cov=app --cov-report=term-missing tests/
