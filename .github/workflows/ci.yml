@@ -34,6 +34,5 @@ jobs:
         ACCESS_TOKEN_EXPIRE_MINUTES: "15"
         APP_USER: "test_user"
         APP_PASS: "test_pass"
-        PYTHONPATH: "."
       run: |
         pytest tests/ --cov=src --cov=app --cov-report=xml
