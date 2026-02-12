@@ -4,11 +4,6 @@ import pandas as pd
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 
-# sys.path hack removido - agora usamos pacote instalado
-# SRC_DIR = Path(__file__).resolve().parent
-# PROJECT_ROOT = SRC_DIR.parent
-# sys.path.append(str(PROJECT_ROOT))
-
 # Imports internos
 from src.config import DATA_PATH, FEATURE_COLS, RANDOM_STATE, MODEL_PATH, MODELS_DIR
 from src.data_loader import load_data

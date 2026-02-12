@@ -3,6 +3,9 @@ import pandas as pd
 from app import state
 from app.auth import get_current_user
 from app.schemas import PredictionInput, PredictionOutput
+import csv
+import os
+from datetime import datetime
 
 router = APIRouter()
 
@@ -31,52 +34,60 @@ def predict(data: PredictionInput):
     if state.MODEL is None:
         raise HTTPException(status_code=503, detail="Modelo não carregado")
 
-    # Converte para DataFrame
+    # Converte os dados de entrada para DataFrame (formato esperado pelo modelo)
     input_data = data.model_dump()
     df = pd.DataFrame([input_data])
     
     try:
-        # --- LOGGING INIT ---
-        # Salva o input no historico de produção (CSV local)
-        # A ideia é implementar um banco de dados para produção real/futuro
-        import csv
-        import os
-        from datetime import datetime
+        # --- 1. INFERÊNCIA OTIMIZADA ---
+        # Calculamos APENAS a probabilidade, pois a classe final será decidida 
+        # dinamicamente com base no threshold do usuário.
+                
+        prob_raw = state.MODEL.predict_proba(df)
         
+        # Extração segura do valor float (compatível com array 1D ou 2D)
+        probability_value = prob_raw.flatten()[0]
+        if hasattr(probability_value, "item"):
+            probability_value = probability_value.item()
+
+        # --- 2. Define a predição final baseada no limiar (threshold) escolhido pelo usuário.
+        # Se probabilidade >= threshold -> Alto Risco (1)
+        # Caso contrário -> Baixo Risco (0)
+        prediction_final = 1 if probability_value >= data.threshold else 0
+        
+        status = "Alto Risco" if prediction_final == 1 else "Baixo Risco"
+
+        # --- 3. LOGGING COMPLETO (Input + Output) ---
+        # Salva o histórico para monitoramento futuro de Data Drift e Concept Drift.
+            
         LOG_FILE = "data/production_logs.csv"
         os.makedirs("data", exist_ok=True)
         
-        # Adiciona timestamp
+        # Prepara o registro completo
         log_entry = input_data.copy()
         log_entry["timestamp"] = datetime.now().isoformat()
+        log_entry["prediction"] = prediction_final  # O que foi decidido de fato
+        log_entry["probability"] = probability_value # A certeza do modelo
+        log_entry["status"] = status
         
-        # Escreve no CSV (Append mode)
+        # Escreve no CSV (Modo Append)
         file_exists = os.path.isfile(LOG_FILE)
         with open(LOG_FILE, mode="a", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=log_entry.keys())
             if not file_exists:
                 writer.writeheader()
             writer.writerow(log_entry)
-        # --- LOGGING END ---
+        # --- FIM DO LOGGING ---
 
-        # Realiza a predição
-        # Passando features brutas para o pipeline que lida com o pré-processamento
-        pred_raw = state.MODEL.predict(df)
-        prob_raw = state.MODEL.predict_proba(df)
-        
-        # Pega o primeiro elemento (suporta tanto array 1D quanto 2D)
-        prediction_value = pred_raw.flatten()[0]
-        probability_value = prob_raw.flatten()[0]
-        
-        # Conversão robusta para tipos nativos do Python
-        if hasattr(prediction_value, "item"):
-            prediction_value = prediction_value.item()
-            
-        if hasattr(probability_value, "item"):
-            probability_value = probability_value.item()
+        # Retorna o resultado estruturado
+        return PredictionOutput(
+            prediction=int(prediction_final), 
+            probability=float(probability_value),
+            status=status
+        )
 
-        return PredictionOutput(prediction=int(prediction_value), probability=float(probability_value))
     except Exception as e:
+        # Em caso de erro, retorna 500 com detalhes para debug
         raise HTTPException(status_code=500, detail=f"Erro na predição: {str(e)}")
 
 @router.get("/history",

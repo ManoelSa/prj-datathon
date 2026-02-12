@@ -24,7 +24,9 @@ class PredictionInput(BaseModel):
     IAN: float = Field(..., description="Índice de Adequação de Nível")
     INDE: float = Field(..., description="Índice de Desenvolvimento Educacional")
     Defasagem: float = Field(..., description="Defasagem Escolar")
+    threshold: float = Field(0.5, description="Limiar de Risco (0.0 a 1.0)", ge=0.0, le=1.0)
 
 class PredictionOutput(BaseModel):
     prediction: int = Field(..., description="Predição de Risco (0 ou 1)")
     probability: float = Field(..., description="Probabilidade de Risco")
+    status: str = Field(..., description="Status de Risco (Ex: Baixo Risco, Alto Risco)")

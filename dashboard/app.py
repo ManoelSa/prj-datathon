@@ -95,6 +95,18 @@ with st.sidebar:
             st.session_state.token = None
             st.rerun()
 
+    # Configuração de Sensibilidade
+    st.markdown("---")
+    st.header("Configurações do Modelo")
+    threshold = st.slider(
+        "Sensibilidade de Risco (Threshold)", 
+        min_value=0.0, 
+        max_value=1.0, 
+        value=0.5, 
+        step=0.05,
+        help="Ajuste o limiar de decisão. Valores menores tornam o modelo mais sensível (mais alertas). Valores maiores tornam o modelo mais conservador."
+    )
+
 # --- Página: Predição Individual ---
 if page == "Predição Individual":
     if st.session_state.token:
@@ -121,7 +133,8 @@ if page == "Predição Individual":
             input_data = {
                 "IAA": iaa, "IEG": ieg, "IPS": ips,
                 "IDA": ida, "IPP": ipp, "IPV": ipv,
-                "IAN": ian, "INDE": inde, "Defasagem": defasagem
+                "IAN": ian, "INDE": inde, "Defasagem": defasagem,
+                "threshold": threshold
             }
             
             with st.spinner("Processando..."):
@@ -130,18 +143,49 @@ if page == "Predição Individual":
             if result:
                 prediction = result.get("prediction")
                 probability = result.get("probability", 0.0)
+                status = result.get("status")
                 
                 st.markdown("### Resultado da Análise")
                 
-                if prediction == 1:
-                    st.error(f"⚠️ **Alto Risco de Evasão** (Probabilidade: {probability:.1%})")
-                    st.warning("Recomendação: Iniciar protocolo de intervenção pedagógica imediata.")
+                # Layout de colunas para métricas (Texto/Print na Tela)
+                col_metric1, col_metric2, col_metric3 = st.columns(3)
+
+                with col_metric1:
+                    # Mostra a probabilidade real
+                    st.metric(
+                        label="Probabilidade Calculada", 
+                        value=f"{probability:.1%}"
+                    )
+                
+                with col_metric2:
+                    # Mostra o critério usado pelo usuário
+                    st.metric(
+                        label="Seu Limite (Threshold)", 
+                        value=f"{threshold:.1%}"
+                    )
+
+                with col_metric3:
+                    # Mostra a diferença (Delta) para explicar a decisão
+                    delta = probability - threshold
+                    st.metric(
+                        label="Margem de Decisão", 
+                        value=f"{delta:.1%}",
+                        delta_color="inverse" # Vermelho se positivo (acima do limite), Verde se negativo
+                    )
+
+                # Explicação Textual Clara
+                st.markdown("---")
+                if status == "Alto Risco":
+                    st.error(f"⚠️ **ALTO RISCO CONFIRMADO**")
+                    st.write(f"A probabilidade ({probability:.1%}) está **ACIMA** do limite de sensibilidade que você definiu ({threshold:.1%}).")
+                    st.warning("👉 Recomendação: Iniciar protocolo de intervenção pedagógica imediata.")
                 else:
-                    st.success(f"✅ **Baixo Risco** (Probabilidade: {probability:.1%})")
-                    st.info("Recomendação: Manter acompanhamento regular.")
+                    st.success(f"✅ **BAIXO RISCO (MONITORADO)**")
+                    st.write(f"A probabilidade ({probability:.1%}) está **ABAIXO** do limite de sensibilidade que você definiu ({threshold:.1%}).")
+                    st.info("👉 Recomendação: Manter acompanhamento regular.")
                 
                 # Detalhes técnicos (expander)
-                with st.expander("Detalhes Técnicos"):
+                with st.expander("Detalhes Técnicos (JSON)"):
                     st.json(result)
 
     else:

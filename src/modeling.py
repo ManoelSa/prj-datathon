@@ -71,7 +71,7 @@ class RiskModel:
         Args:
             filepath (str): Caminho de destino para o arquivo (.joblib).
         """
-        joblib.dump(self.model, filepath)
+        joblib.dump(self, filepath)
         print(f"Modelo salvo em {filepath}")
         
     def load(self, filepath):

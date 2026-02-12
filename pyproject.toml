@@ -10,10 +10,10 @@ authors = [
     {name = "Manoel Sa"},
 ]
 dependencies = [
-    "pandas==3.0.0",
+    "pandas==2.3.3",
     "scikit-learn==1.8.0",
     "joblib==1.5.3",
-    "numpy==2.4.2",
+    "numpy==1.26.4",
     "openpyxl==3.1.5",
 ]
 requires-python = ">=3.12"
