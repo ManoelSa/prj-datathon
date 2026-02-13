@@ -72,7 +72,7 @@ def main():
     # Cria diretório se não existir
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
     
-    # Salva CSV leve
+    # Salva CSV
     df_ref.to_csv(OUTPUT_PATH, index=False)
     print(f"Sucesso! Dados de referência extraídos para {OUTPUT_PATH}")
     print(f"Linhas: {len(df_ref)}")

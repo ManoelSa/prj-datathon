@@ -70,7 +70,7 @@ def predict(data: PredictionInput):
         log_entry["probability"] = probability_value # A certeza do modelo
         log_entry["status"] = status
         
-        # Escreve no CSV (Modo Append)
+        # Escreve no CSV (Modo Append)  << No futuro trocar todo este processo para banco de dados >> 
         file_exists = os.path.isfile(LOG_FILE)
         with open(LOG_FILE, mode="a", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=log_entry.keys())

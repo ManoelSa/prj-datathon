@@ -63,7 +63,7 @@ def predict(token, input_data):
 st.sidebar.title("Navegação")
 page = st.sidebar.radio("Ir para", ["Predição Individual", "Monitoramento de Drift"])
 
-st.title("🎓 Sistema de Alerta Preventivo")
+st.title("🎓 SAPE - Sistema de Alerta Preventivo Escolar")
 st.markdown("---")
 
 # Gerenciamento de Sessão
@@ -191,9 +191,11 @@ if page == "Predição Individual":
     else:
         st.info("👈 Por favor, faça login na barra lateral para acessar o sistema.")
         st.markdown("""
-        ### Sobre o Sistema
-        Este dashboard utiliza um modelo de Machine Learning para predizer o risco de evasão escolar com base em indicadores educacionais.
-        
+        ### Sobre o SAPE
+        O **SAPE** (Sistema de Alerta Preventivo Escolar) utiliza **Inteligência Artificial** para identificar precocemente o risco de evasão escolar.
+
+        Através da análise de dados **socioemocionais e acadêmicos**, a ferramenta apoia a gestão na tomada de decisão pedagógica assertiva.
+
         **Conecte-se para começar.**
         """)
 

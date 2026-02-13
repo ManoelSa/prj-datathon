@@ -10,10 +10,12 @@ from datetime import timedelta
 from starlette.responses import Response
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST, Counter, Histogram
 
+# Importações após atualização do sys.path
 from app import state
 from app.router import router as prediction_router
 from app.auth import Token, authenticate_user, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
 
+# Define constantes
 # Define constantes
 PROJECT_ROOT = Path(__file__).resolve().parent.parent  # Mantém apenas para referência de caminhos de arquivos
 MODEL_PATH = os.path.join(PROJECT_ROOT, "app", "models", "risk_model.joblib")
@@ -58,8 +60,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="API de Previsão de Risco",
-    description="API para previsão de risco estudantil usando Random Forest",
+    title="SAPE - Sistema de Alerta Preventivo Escolar",
+    description="API de Inteligência Artificial para identificação precoce de risco de evasão escolar. Utiliza análise de dados socioemocionais e acadêmicos para apoiar a tomada de decisão pedagógica",
     version="1.0.0",
     lifespan=lifespan
 )
