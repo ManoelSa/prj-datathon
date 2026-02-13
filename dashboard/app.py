@@ -173,7 +173,6 @@ if page == "Predição Individual":
                         delta_color="inverse" # Vermelho se positivo (acima do limite), Verde se negativo
                     )
 
-                # Explicação Textual Clara
                 st.markdown("---")
                 if status == "Alto Risco":
                     st.error(f"⚠️ **ALTO RISCO CONFIRMADO**")

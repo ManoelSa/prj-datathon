@@ -6,6 +6,7 @@ from app.schemas import PredictionInput, PredictionOutput
 import csv
 import os
 from datetime import datetime
+import json
 
 router = APIRouter()
 
@@ -105,6 +106,6 @@ def get_prediction_history():
     
     try:
         df = pd.read_csv(LOG_FILE)
-        return df.to_dict(orient="records")
+        return json.loads(df.to_json(orient="records"))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao ler histórico: {str(e)}")
