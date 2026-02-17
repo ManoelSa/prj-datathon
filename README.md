@@ -69,20 +69,50 @@ docker-compose up --build
 
 ### Instalação e Execução via Python Local
 
-1.  **Instalação de Dependências:**
+1.  **Prepare o Ambiente (Virtualenv):**
     ```bash
-    pip install .  # Instala o projeto via pyproject.toml
+    # Crie o ambiente virtual
+    python -m venv venv
+
+    # Ative o ambiente
+    # Windows:
+    .\venv\Scripts\activate
+    # Linux/Mac:
+    source venv/bin/activate
     ```
 
-2.  **Treinar e Validar o Modelo:**
+2.  **Variáveis de Ambiente (.env):**
+    Crie um arquivo `.env` na raiz do projeto com o seguinte conteúdo (ajuste as credenciais conforme desejado):
+    ```ini
+    APP_USER=admin
+    APP_PASS=admin
+    SECRET_KEY=sua_chave_secreta_aqui
+    ALGORITHM=HS256
+    ACCESS_TOKEN_EXPIRE_MINUTES=30
+    API_URL=http://localhost:8000
+    ```
+    *(Você pode copiar do arquivo `.env.example` incluído no repositório)*
+
+3.  **Instalação de Dependências:**
+    Para garantir que **tanto** a API/Dashboard quanto o pacote de ML (`src`) sejam instalados corretamente:
+    ```bash
+    pip install -r requirements.txt  # Instala bibliotecas externas (FastAPI, Streamlit, etc)
+    pip install -e .                 # Instala o nosso pacote 'src' em modo editável
+    ```
+
+4.  **Treinar e Validar o Modelo:**
     ```bash
     python src/train_pipeline.py
     # Output: Modelo salvo em app/models/risk_model.joblib e Relatório de Confiabilidade gerado.
     ```
 
-3.  **Rodar a API:**
+5.  **Rodar a API:**
     ```bash
     uvicorn app.main:app --reload
+    ```
+6.  **Rodar o Dashboard:**
+    ```bash
+    streamlit run dashboard/app.py
     ```
 
 ---

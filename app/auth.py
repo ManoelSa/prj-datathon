@@ -37,7 +37,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     Args:
         data (dict): Dicionário contendo os dados a serem codificados no token.
         expires_delta (Optional[timedelta], optional): Tempo de expiração do token. 
-            Se não fornecido, o padrão é 15 minutos.
+            Se não fornecido, o padrão é 30 minutos.
 
     Returns:
         str: O token JWT codificado.
