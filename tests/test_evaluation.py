@@ -28,12 +28,15 @@ def test_print_reliability_report(capsys):
     metrics = {
         'auc': 0.85,
         'report': {
-            '1': {'precision': 0.75}
+            '1': {'precision': 0.75, 'recall': 0.80}
         }
     }
     
     print_reliability_report(metrics)
     
     captured = capsys.readouterr()
-    assert "Métrica Principal (ROC AUC): 0.8500" in captured.out
-    assert "Precision de 0.75" in captured.out
+    # Verifica se a nova mensagem focada em Recall está presente
+    assert "Relatório de Confiabilidade do Modelo SAPE" in captured.out
+    assert "Métrica Principal de Decisão: Recall" in captured.out
+    assert "80.00%" in captured.out
+    assert "Robustez Geral (ROC AUC 0.85)" in captured.out
