@@ -168,7 +168,9 @@ O pipeline de dados (`src/`) segue uma arquitetura modularizada:
     *   **Correção de Defasagem:** Aplicação de regra de negócio (Idade vs Fase Ideal) para corrigir dados inconsistentes.
 3.  **Pré-processamento (`preprocessing.py`):** Imputação de nulos (Mediana) e normalização de escalas (StandardScaler) usando Pipelines do Scikit-Learn.
 4.  **Seleção e Treinamento de Modelo (`modeling.py`):** Treinamento de um **Random Forest Classifier**, escolhido pela robustez em dados tabulares e capacidade de lidar com relações não lineares.
-5.  **Avaliação (`evaluation.py`):** Geração do **Relatório de Confiabilidade Educacional**, focando na métrica de **Recall/Sensibilidade** para minimizar falsos negativos (alunos em risco não detectados).
+5.  **Avaliação (`evaluation.py`):** Geração do **Relatório de Confiabilidade Educacional**.
+    *   **Métrica Principal (Recall):** O modelo prioriza a **Sensibilidade (Recall)**. No contexto educacional, o custo de não identificar um aluno em risco (Falso Negativo) é muito maior do que alertar um aluno que não precisava (Falso Positivo). A meta é garantir que nenhum aluno vulnerável seja "deixado para trás".
+    *   **Threshold Ajustável:** Por padrão, o modelo classifica como "Risco" qualquer probabilidade acima de **0.5 (50%)**. Este limiar é parametrizável na API, permitindo ajustar a sensibilidade da "Rede de Segurança" conforme a capacidade de atendimento da equipe pedagógica (ex: baixar para 0.4 para capturar mais casos, aceitando mais falsos positivos).
 
 ---
 
@@ -185,3 +187,35 @@ Além do Dashboard interativo, o projeto já inclui uma stack de monitoramento (
 *   **URL:** `http://localhost:3000`
 *   **Função:** Dashboards visuais para acompanhar a saúde do sistema.
 *   **Acesso:** Usuário `admin` / Senha `admin` (padrão inicial).
+
+---
+
+## 7) CI/CD e Deploy Automático
+
+O projeto utiliza práticas modernas de **DevOps** para garantir qualidade e entrega contínua:
+
+### Integração Contínua (CI) - GitHub Actions
+Arquivo: `.github/workflows/ci.yml`
+*   **Gatilho:** Todo *Pull Request* para a branch `main`.
+*   **Ações:**
+    1.  Setup do ambiente Python.
+    2.  Instalação de dependências.
+    3.  Execução automática de testes unitários (`pytest`).
+    4.  Verificação de cobertura de código.
+*   **Objetivo:** Impedir que código quebrado ou sem testes chegue à produção (Quality Gate).
+
+### Entrega Contínua (CD)
+A branch `main` é a fonte da verdade para produção.
+1.  **API (Render):** Conectado ao repositório GitHub. A cada merge na `main`, o Render detecta o novo commit, reconstrói o Docker Container da API e faz o deploy automaticamente.
+2.  **Dashboard (Streamlit Cloud):** Também observa a `main`. Atualizações no código do dashboard são refletidas quase instantaneamente na aplicação online.
+
+---
+
+## 8) Melhorias Futuras (Roadmap)
+
+Para evoluir este MVP para uma solução Enterprise escalável, sugerimos os seguintes pontos:
+
+*   **Autenticação:** Migrar do atual sistema de usuário único (variáveis de ambiente) para uma gestão de usuários via **Banco de Dados** (PostgreSQL/MySQL), permitindo múltiplos perfis e controle de acesso granular.
+*   **Persistência de Dados:** Substituir os arquivos CSV (logs e métricas) por um **Data Warehouse** ou Banco Relacional estruturado. Isso garantirá integridade, backup automático e performance para grandes volumes de dados históricos.
+*   **Monitoramento em Nuvem:** Migrar o stack Prometheus/Grafana para instâncias gerenciadas na nuvem, permitindo alertas via Email/Slack em caso de falhas ou degradação do modelo.
+*   **MLflow (Experiment Tracking):** Implementar um servidor MLflow para rastrear experimentos, versionar modelos e comparar métricas de diferentes rodadas de treinamento de forma centralizada.
