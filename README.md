@@ -1,5 +1,11 @@
 # 🎓 SAPE - Sistema de Alerta Preventivo Escolar
 
+
+> 🔗 **Links Rápidos (Demo Online):**
+> *   **Dashboard (Streamlit):** [app-modelo-risco.streamlit.app](https://app-modelo-risco.streamlit.app/)
+> *   **API Docs (Swagger):** [api-modelo-risco.onrender.com/docs](https://api-modelo-risco.onrender.com/docs)
+> *   **API ReDoc:** [api-modelo-risco.onrender.com/redoc](https://api-modelo-risco.onrender.com/redoc)
+
 ## 1) Visão Geral do Projeto 
 **Objetivo:** Identificar precocemente alunos em risco de evasão escolar usando Inteligência Artificial.
 
