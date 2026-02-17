@@ -21,8 +21,9 @@ COPY pyproject.toml .
 # Instala o pacote 'src' no ambiente Python do container
 RUN pip install .
 
-# Copia o restante da aplicação (API)
+# Copia o restante da aplicação (API e Dashboard)
 COPY app/ ./app/
+COPY dashboard/ ./dashboard/
 
 # Expõe a porta da API
 EXPOSE 8000

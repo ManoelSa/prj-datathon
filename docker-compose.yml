@@ -1,7 +1,7 @@
 services:
   api:
-    image: api-modelo-risco:latest # Nome da imagem
-    container_name: app-modelo-risco # Nome do container
+    image: api-modelo-risco:latest
+    container_name: app-modelo-risco
     build: .
     ports:
       - "8000:8000"
@@ -34,6 +34,24 @@ services:
       - grafana_data:/var/lib/grafana
     depends_on:
       - prometheus
+
+  dashboard:
+    image: dashboard-modelo-risco:latest
+    container_name: dashboard-modelo-risco
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./app:/app/app
+      - ./src:/app/src
+      - ./dashboard:/app/dashboard
+      - ./data:/app/data
+    environment:
+      - API_URL=http://api:8000
+    command: streamlit run dashboard/app.py
+    depends_on:
+      - api
+    restart: always
 
 volumes:
   grafana_data:

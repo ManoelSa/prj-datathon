@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler
 
 class TemporalPreprocessor(BaseEstimator, TransformerMixin):
     """
@@ -46,8 +47,30 @@ class TemporalPreprocessor(BaseEstimator, TransformerMixin):
         Returns:
             pd.DataFrame: Novo DataFrame com valores imputados e colunas/índices preservados.
         """
+
         X_copy = X.copy()
         X_imputed = self.imputer.transform(X_copy[self.feature_cols])
         return pd.DataFrame(X_imputed, columns=self.feature_cols, index=X.index)
+
+
+class DataFrameScaler(BaseEstimator, TransformerMixin):
+    """
+    Transformador compatível com Scikit-Learn que aplica StandardScaler e retorna um DataFrame.
+    Isso é importante para manter os nomes das colunas e índices.
+    """
+    def __init__(self, feature_cols=None):
+        self.feature_cols = feature_cols
+        self.scaler = StandardScaler()
+        
+    def fit(self, X, y=None):
+        if self.feature_cols is None:
+            self.feature_cols = X.columns.tolist()
+        self.scaler.fit(X[self.feature_cols])
+        return self
+        
+    def transform(self, X):
+        X_copy = X.copy()
+        X_scaled = self.scaler.transform(X_copy[self.feature_cols])
+        return pd.DataFrame(X_scaled, columns=self.feature_cols, index=X.index)
 
 

@@ -8,7 +8,7 @@ from sklearn.ensemble import RandomForestClassifier
 from src.config import DATA_PATH, FEATURE_COLS, RANDOM_STATE, MODEL_PATH, MODELS_DIR
 from src.data_loader import load_data
 from src.feature_engineering import create_temporal_dataset
-from src.preprocessing import TemporalPreprocessor
+from src.preprocessing import TemporalPreprocessor, DataFrameScaler
 from src.modeling import RiskModel
 from src.evaluation import evaluate_model, print_reliability_report
 
@@ -43,10 +43,11 @@ def main():
     print(f"Treino: {X_train.shape}, Teste: {X_test.shape}")
     
     # 5. Construindo Pipeline
-    print("Construindo Pipeline (Preprocessor + Model)...")
+    print("Construindo Pipeline (Preprocessor + Scaler + Model)...")
     
     pipeline = Pipeline([
         ('preprocessor', TemporalPreprocessor(feature_cols=train_cols)),
+        ('scaler', DataFrameScaler(feature_cols=train_cols)),
         ('clf', RandomForestClassifier(
             n_estimators=200, 
             max_depth=5, 
