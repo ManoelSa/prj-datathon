@@ -10,6 +10,19 @@ import json
 
 router = APIRouter()
 
+# Escreve no CSV (Modo Append) << No futuro trocar todo este processo para banco de dados >>
+def log_prediction(log_entry: dict):
+    """Salva a predição no arquivo de logs (CSV)."""
+    LOG_FILE = "data/production_logs.csv"
+    os.makedirs("data", exist_ok=True)
+    
+    file_exists = os.path.isfile(LOG_FILE)
+    with open(LOG_FILE, mode="a", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=log_entry.keys())
+        if not file_exists:
+            writer.writeheader()
+        writer.writerow(log_entry)
+
 @router.post("/predict", 
     response_model=PredictionOutput, 
     dependencies=[Depends(get_current_user)],
@@ -60,24 +73,18 @@ def predict(data: PredictionInput):
 
         # --- 3. LOGGING COMPLETO (Input + Output) ---
         # Salva o histórico para monitoramento futuro de Data Drift e Concept Drift.
+        try:
+            # Prepara o registro completo
+            log_entry = input_data.copy()
+            log_entry["timestamp"] = datetime.now().isoformat()
+            log_entry["prediction"] = prediction_final
+            log_entry["probability"] = probability_value
+            log_entry["status"] = status
             
-        LOG_FILE = "data/production_logs.csv"
-        os.makedirs("data", exist_ok=True)
-        
-        # Prepara o registro completo
-        log_entry = input_data.copy()
-        log_entry["timestamp"] = datetime.now().isoformat()
-        log_entry["prediction"] = prediction_final  # O que foi decidido de fato
-        log_entry["probability"] = probability_value # A certeza do modelo
-        log_entry["status"] = status
-        
-        # Escreve no CSV (Modo Append)  << No futuro trocar todo este processo para banco de dados >> 
-        file_exists = os.path.isfile(LOG_FILE)
-        with open(LOG_FILE, mode="a", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=log_entry.keys())
-            if not file_exists:
-                writer.writeheader()
-            writer.writerow(log_entry)
+            log_prediction(log_entry)
+        except Exception as e:
+            # Não falha a requisição se o log falhar, apenas imprime erro no console
+            print(f"Erro ao salvar log: {e}")
         # --- FIM DO LOGGING ---
 
         # Retorna o resultado estruturado
@@ -97,15 +104,28 @@ def predict(data: PredictionInput):
     summary="Histórico de Predições",
     description="Retorna os dados de entrada das últimas predições para análise de Drift."
 )
-def get_prediction_history():
-    """Lê o arquivo de logs e retorna como JSON."""
+def get_prediction_history(limit: int = 100):
+    """
+    Lê o arquivo de logs e retorna como JSON.
+    Args:
+        limit (int): Número máximo de registros para retornar (padrão: 100).
+    """
     LOG_FILE = "data/production_logs.csv"
     import os
     if not os.path.exists(LOG_FILE):
         return []
     
     try:
+        # Leitura otimizada: ler tudo mas retornar apenas os últimos 'limit'
+        # Futuro migrar para BANCO de DADOS
         df = pd.read_csv(LOG_FILE)
-        return json.loads(df.to_json(orient="records"))
+        
+        # Pega os últimos N registros
+        df_limited = df.tail(limit)
+        
+        # Ordena do mais recente para o mais antigo
+        df_limited = df_limited[::-1]
+        
+        return json.loads(df_limited.to_json(orient="records"))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao ler histórico: {str(e)}")

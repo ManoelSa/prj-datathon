@@ -10,10 +10,12 @@ def evaluate_model(y_test, y_pred, y_prob):
     Returns:
         dict: Dicionário com metricas (auc, report).
     """
+    full_report = classification_report(y_test, y_pred)
     report = classification_report(y_test, y_pred, output_dict=True)
     auc = roc_auc_score(y_test, y_prob)
     
     print("\n--- Model Evaluation ---")
+    print(full_report)
     print(f"ROC AUC: {auc:.4f}")
     if '1' in report:
         print(f"Precision (Risk): {report['1']['precision']:.4f}")

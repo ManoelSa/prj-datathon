@@ -125,7 +125,46 @@ if page == "Predição Individual":
             ipv = st.slider("IPV - Ponto de Virada", 0.0, 10.0, 5.0, 0.1)
             ian = st.slider("IAN - Adequação de Nível", 0.0, 10.0, 5.0, 0.1)
             inde = st.slider("INDE - Desenvolvimento Educacional", 0.0, 10.0, 5.0, 0.1)
-            defasagem = st.number_input("Nível de Defasagem", -10.0, 10.0, 0.0, 0.5, help="Valores negativos indicam adiantamento, positivos indicam atraso.")
+            
+            st.markdown("#### Dados de Fase e Idade")
+            c_idade, c_fase = st.columns(2)
+            
+            with c_idade:
+                idade = st.number_input("Idade do Aluno", min_value=6, max_value=50, value=14, step=1)
+                
+            with c_fase:
+                fase_opcoes = {
+                    0: "Alfa (1º e 2º ano)",
+                    1: "Fase 1 (3º e 4º ano)",
+                    2: "Fase 2 (5º e 6º ano)",
+                    3: "Fase 3 (7º e 8º ano)",
+                    4: "Fase 4 (9º ano)",
+                    5: "Fase 5 (1º EM)",
+                    6: "Fase 6 (2º EM)",
+                    7: "Fase 7 (3º EM)",
+                    8: "Fase 8 (Universitário)"
+                }
+                # User seleciona o texto, mas o valor é a chave (int)
+                fase_label = st.selectbox("Fase Atual", options=list(fase_opcoes.values()), index=4)
+                # Reverse lookup para pegar o ID da fase (0-8)
+                fase_real = next(k for k, v in fase_opcoes.items() if v == fase_label)
+
+            # Lógica de Cálculo (Espelho do Backend)
+            AGE_FASE_MAP = {
+                6: 0, 7: 0, 8: 0, 9: 1, 10: 2, 11: 2, 12: 3, 13: 3, 14: 4, 
+                15: 5, 16: 6, 17: 7, 18: 8, 19: 8, 20: 8, 21: 8, 22: 8, 23: 8, 24: 8
+            }
+            
+            target_ideal = AGE_FASE_MAP.get(idade, 8 if idade > 18 else 0)
+            defasagem_calc = fase_real - target_ideal
+            
+            # Feedback visual do cálculo
+            if defasagem_calc < 0:
+                st.warning(f"⚠️ Defasagem Calculada: {defasagem_calc} (Atraso de {-defasagem_calc} fases)")
+            elif defasagem_calc > 0:
+                st.info(f"🚀 Defasagem Calculada: {defasagem_calc} (Adiantado em {defasagem_calc} fases)")
+            else:
+                st.success(f"✅ Defasagem Calculada: {defasagem_calc} (Em dia com a idade)")
 
         st.markdown("---")
         
@@ -133,7 +172,7 @@ if page == "Predição Individual":
             input_data = {
                 "IAA": iaa, "IEG": ieg, "IPS": ips,
                 "IDA": ida, "IPP": ipp, "IPV": ipv,
-                "IAN": ian, "INDE": inde, "Defasagem": defasagem,
+                "IAN": ian, "INDE": inde, "Defasagem": float(defasagem_calc),
                 "threshold": threshold
             }
             

@@ -15,15 +15,15 @@ class PredictionInput(BaseModel):
         }
     })
 
-    IAA: float = Field(..., description="Índice de Autoavaliação da Aprendizagem")
-    IEG: float = Field(..., description="Índice de Engajamento Geral")
-    IPS: float = Field(..., description="Índice Psicossocial")
-    IDA: float = Field(..., description="Índice de Dificuldade de Aprendizagem")
-    IPP: float = Field(..., description="Índice de Prática Pedagógica")
-    IPV: float = Field(..., description="Índice de Ponto de Virada")
-    IAN: float = Field(..., description="Índice de Adequação de Nível")
-    INDE: float = Field(..., description="Índice de Desenvolvimento Educacional")
-    Defasagem: float = Field(..., description="Defasagem Escolar")
+    IAA: float | None = Field(None, description="Índice de Autoavaliação da Aprendizagem")
+    IEG: float | None = Field(None, description="Índice de Engajamento Geral")
+    IPS: float | None = Field(None, description="Índice Psicossocial")
+    IDA: float | None = Field(None, description="Índice de Dificuldade de Aprendizagem")
+    IPP: float | None = Field(None, description="Índice de Prática Pedagógica")
+    IPV: float | None = Field(None, description="Índice de Ponto de Virada")
+    IAN: float | None = Field(None, description="Índice de Adequação de Nível")
+    INDE: float | None = Field(None, description="Índice de Desenvolvimento Educacional")
+    Defasagem: float | None = Field(None, description="Defasagem Escolar")
     threshold: float = Field(0.5, description="Limiar de Risco (0.0 a 1.0)", ge=0.0, le=1.0)
 
 class PredictionOutput(BaseModel):

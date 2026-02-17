@@ -72,5 +72,13 @@ def main():
     MODELS_DIR.mkdir(exist_ok=True)
     model.save(str(MODEL_PATH))
     
+    # 9. Salvando Dados de Referência para Drift (Dashboard)
+    ref_path = Path("data/reference_data.csv")
+    ref_path.parent.mkdir(exist_ok=True)
+    
+    print(f"Salvando dados de referência em {ref_path}...")
+    # Salvar features de treino como referência
+    X_train.to_csv(ref_path, index=False)
+    
 if __name__ == "__main__":
     main()

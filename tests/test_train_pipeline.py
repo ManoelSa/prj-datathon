@@ -10,7 +10,9 @@ from src.config import FEATURE_COLS
 @patch('src.train_pipeline.RiskModel')
 @patch('src.train_pipeline.evaluate_model')
 @patch('src.train_pipeline.print_reliability_report')
+@patch('pandas.DataFrame.to_csv') # Mock do salvamento de arquivo
 def test_train_pipeline_main_success(
+    mock_to_csv,
     mock_print_report,
     mock_evaluate,
     mock_risk_model,
