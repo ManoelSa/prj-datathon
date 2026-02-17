@@ -257,9 +257,19 @@ elif page == "Monitoramento de Drift":
         
     # 2. Carregar Production Data (Dinâmico, da API)
     if st.session_state.token:
+        # Opção para o usuário controlar o volume de dados
+        limit_options = {100: "Últimos 100", 500: "Últimos 500", 1000: "Últimos 1000", 0: "Todos (Sem Limite)"}
+        selected_limit = st.selectbox(
+            "Selecione o volume de dados para análise:", 
+            options=list(limit_options.keys()), 
+            format_func=lambda x: limit_options[x],
+            index=2 # Default: 1000
+        )
+        
         try:
             headers = {"Authorization": f"Bearer {st.session_state.token}"}
-            response = requests.get(f"{API_URL}/history", headers=headers, timeout=5)
+            # Passa o limit como query param
+            response = requests.get(f"{API_URL}/history", headers=headers, params={"limit": selected_limit}, timeout=10)
             
             if response.status_code == 200:
                 history_data = response.json()
@@ -294,11 +304,25 @@ elif page == "Monitoramento de Drift":
             
             with col1:
                 st.write(f"### Distribuição: {feature}")
-                chart_data = pd.DataFrame({
-                    "Referência (Treino)": df_ref[feature],
-                    "Atual (Produção)": df_curr[feature]
-                })
-                st.line_chart(chart_data)
+                
+                # Prepara dados para o gráfico, tratando None/NaN misturado com números.
+                ref_series = pd.to_numeric(df_ref[feature], errors='coerce').dropna().reset_index(drop=True)
+                curr_series = pd.to_numeric(df_curr[feature], errors='coerce').dropna().reset_index(drop=True)
+                
+                # Só plota se tiver dados válidos e comparáveis
+                if not ref_series.empty and not curr_series.empty:
+                    # Alinha os indexes para o gráfico não quebrar
+                    min_len = min(len(ref_series), len(curr_series))
+                    if min_len > 0:
+                        chart_data = pd.DataFrame({
+                            "Referência (Treino)": ref_series.iloc[:min_len],
+                            "Atual (Produção)": curr_series.iloc[:min_len]
+                        })
+                        st.line_chart(chart_data)
+                    else:
+                        st.warning("Dados insuficientes para plotar comparação.")
+                else:
+                    st.warning(f"A coluna '{feature}' contém apenas valores nulos ou inválidos.")
                 
             with col2:
                 st.write("### Estatísticas Descritivas")

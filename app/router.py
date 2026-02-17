@@ -108,7 +108,8 @@ def get_prediction_history(limit: int = 100):
     """
     Lê o arquivo de logs e retorna como JSON.
     Args:
-        limit (int): Número máximo de registros para retornar (padrão: 100).
+        limit (int): Número máximo de registros para retornar (padrão: 100). 
+                     Use 0 para retornar TODO o histórico.
     """
     LOG_FILE = "data/production_logs.csv"
     import os
@@ -120,8 +121,12 @@ def get_prediction_history(limit: int = 100):
         # Futuro migrar para BANCO de DADOS
         df = pd.read_csv(LOG_FILE)
         
-        # Pega os últimos N registros
-        df_limited = df.tail(limit)
+        # Pega os últimos N registros (Se limit > 0)
+        # Se limit <= 0, retorna TUDO.
+        if limit > 0:
+            df_limited = df.tail(limit)
+        else:
+            df_limited = df
         
         # Ordena do mais recente para o mais antigo
         df_limited = df_limited[::-1]
