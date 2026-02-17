@@ -10,7 +10,7 @@ load_dotenv(find_dotenv())
 
 # Configuração da Página
 st.set_page_config(
-    page_title="Predição de Risco Acadêmico",
+    page_title="SAPE",
     page_icon="🎓",
     layout="wide"
 )

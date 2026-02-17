@@ -186,7 +186,11 @@ Além do Dashboard interativo, o projeto já inclui uma stack de monitoramento (
 ### B. Grafana (Visualização)
 *   **URL:** `http://localhost:3000`
 *   **Função:** Dashboards visuais para acompanhar a saúde do sistema.
+### B. Grafana (Visualização)
+*   **URL:** `http://localhost:3000`
+*   **Função:** Dashboards visuais para acompanhar a saúde do sistema.
 *   **Acesso:** Usuário `admin` / Senha `admin` (padrão inicial).
+*   **Setup Rápido:** Importe o arquivo `metrics/Metricas.json` (Dashboard > Import) para visualizar instantaneamente os painéis pré-configurados do projeto.
 
 ---
 
