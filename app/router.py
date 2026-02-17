@@ -7,8 +7,10 @@ import csv
 import os
 from datetime import datetime
 import json
+import time
 
 router = APIRouter()
+
 
 # Escreve no CSV (Modo Append) << No futuro trocar todo este processo para banco de dados >>
 def log_prediction(log_entry: dict):
@@ -17,9 +19,30 @@ def log_prediction(log_entry: dict):
     os.makedirs("data", exist_ok=True)
     
     file_exists = os.path.isfile(LOG_FILE)
+    
+    # Verifica Schema Evolution (Se adicionarmos novos campos como latency_ms)
+    if file_exists:
+        try:
+            with open(LOG_FILE, 'r', newline='', encoding='utf-8') as f:
+                header = next(csv.reader(f), None)
+            
+            if header:
+                existing_keys = set(header)
+                new_keys = set(log_entry.keys())
+                missing_in_file = new_keys - existing_keys
+                
+                if missing_in_file:
+                    # Reescreve com as novas colunas
+                    df_temp = pd.read_csv(LOG_FILE)
+                    for k in missing_in_file:
+                        df_temp[k] = None # Preenche passados com vazio
+                    df_temp.to_csv(LOG_FILE, index=False)
+        except Exception:
+            pass # Se falhar a migração, tenta append normal
+
     with open(LOG_FILE, mode="a", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=log_entry.keys())
-        if not file_exists:
+        if not file_exists or os.path.getsize(LOG_FILE) == 0:
             writer.writeheader()
         writer.writerow(log_entry)
 
@@ -53,13 +76,14 @@ def predict(data: PredictionInput):
     df = pd.DataFrame([input_data])
     
     try:
-        # --- 1. INFERÊNCIA OTIMIZADA ---
+        # --- 1. INFERÊNCIA ---
+        start_time = time.perf_counter() # Início da medição de latência
+        
         # Calculamos APENAS a probabilidade, pois a classe final será decidida 
         # dinamicamente com base no threshold do usuário.
                 
         prob_raw = state.MODEL.predict_proba(df)
         
-        # Extração segura do valor float (compatível com array 1D ou 2D)
         probability_value = prob_raw.flatten()[0]
         if hasattr(probability_value, "item"):
             probability_value = probability_value.item()
@@ -70,16 +94,20 @@ def predict(data: PredictionInput):
         prediction_final = 1 if probability_value >= data.threshold else 0
         
         status = "Alto Risco" if prediction_final == 1 else "Baixo Risco"
+        
+        end_time = time.perf_counter()
+        latency_ms = (end_time - start_time) * 1000 # Converte para milissegundos
 
         # --- 3. LOGGING COMPLETO (Input + Output) ---
-        # Salva o histórico para monitoramento futuro de Data Drift e Concept Drift.
+        # Salva o histórico para monitoramento futuro de Data Drift e performance da API << No futuro trocar todo este processo para banco de dados >>.
         try:
-            # Prepara o registro completo
+            # Prepara o registro
             log_entry = input_data.copy()
             log_entry["timestamp"] = datetime.now().isoformat()
             log_entry["prediction"] = prediction_final
             log_entry["probability"] = probability_value
             log_entry["status"] = status
+            log_entry["latency_ms"] = round(latency_ms, 2)
             
             log_prediction(log_entry)
         except Exception as e:
@@ -109,7 +137,7 @@ def get_prediction_history(limit: int = 100):
     Lê o arquivo de logs e retorna como JSON.
     Args:
         limit (int): Número máximo de registros para retornar (padrão: 100). 
-                     Use 0 para retornar TODO o histórico.
+                     Use 0 para retornar todo o histórico.
     """
     LOG_FILE = "data/production_logs.csv"
     import os

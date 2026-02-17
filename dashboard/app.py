@@ -61,7 +61,7 @@ def predict(token, input_data):
 # --- Interface do Usuário ---
 
 st.sidebar.title("Navegação")
-page = st.sidebar.radio("Ir para", ["Predição Individual", "Monitoramento de Drift"])
+page = st.sidebar.radio("Ir para", ["Predição Individual", "Monitoramento de Drift", "Performance do Sistema"])
 
 st.title("🎓 SAPE - Sistema de Alerta Preventivo Escolar")
 st.markdown("---")
@@ -355,3 +355,75 @@ elif page == "Monitoramento de Drift":
                 else:
                     st.success(f"✅ **Distribuição Estável** (p-valor >= 0.05)")
                     st.info("Não há evidência estatística suficiente para afirmar que os dados mudaram.")
+
+# --- Página: Performance do Sistema ---
+elif page == "Performance do Sistema":
+    st.header("🚀 Performance do Sistema")
+    st.markdown("Monitoramento de latência e volume de requisições da API.")
+
+    if st.session_state.token:
+        try:
+            # Busca todo o histórico para análise de performance
+            headers = {"Authorization": f"Bearer {st.session_state.token}"}
+            with st.spinner("Carregando logs de performance..."):
+                response = requests.get(f"{API_URL}/history", headers=headers, params={"limit": 0}, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data:
+                    df = pd.DataFrame(data)
+                    
+                    # Garante tipos corretos
+                    if "timestamp" in df.columns:
+                        df["timestamp"] = pd.to_datetime(df["timestamp"])
+                    if "latency_ms" not in df.columns:
+                        st.warning("⚠️ Dados de latência não encontrados nos logs antigos. Novos registros aparecerão aqui.")
+                        df["latency_ms"] = 0.0 # Fallback para não quebrar
+                    
+                    # KPIs Principais
+                    total_req = len(df)
+                    avg_latency = df["latency_ms"].mean() if not df.empty else 0
+                    p95_latency = df["latency_ms"].quantile(0.95) if not df.empty else 0
+                    std_latency = df["latency_ms"].std() if not df.empty and len(df) > 1 else 0
+
+                    
+                    # Layout de Métricas
+                    kpi1, kpi2, kpi3, kpi4 = st.columns(4)
+                    kpi1.metric("Total de Requisições", total_req)
+                    kpi2.metric("Latência Média", f"{avg_latency:.2f} ms")
+                    kpi3.metric("Desvio Padrão", f"{std_latency:.2f} ms")
+                    kpi4.metric("Latência P95", f"{p95_latency:.2f} ms", help="95% das requisições são mais rápidas que isso.")
+                    
+                    st.markdown("---")
+                    
+                    # Gráficos de Série Temporal
+                    chart_col1, chart_col2 = st.columns(2)
+                    
+                    with chart_col1:
+                        st.subheader("⏱️ Latência por Requisição")
+                        if not df.empty and "latency_ms" in df.columns:
+                            st.line_chart(df.set_index("timestamp")["latency_ms"])
+                        else:
+                            st.info("Sem dados para plotar.")
+
+                    with chart_col2:
+                        st.subheader("📊 Volume (Requisições/Minuto)")
+                        if not df.empty and "timestamp" in df.columns:
+                            # Resample para contar registros por minuto
+                            df_throughput = df.set_index("timestamp").resample("min").size()
+                            st.bar_chart(df_throughput)
+                        else:
+                            st.info("Sem dados para plotar.")
+                            
+                    # Tabela de Dados Recentes
+                    with st.expander("Ver Logs Recentes"):
+                        st.dataframe(df.head(50))
+                else:
+                    st.info("Nenhum log de performance encontrado.")
+            else:
+                st.error(f"Erro ao buscar logs: {response.text}")
+                
+        except Exception as e:
+            st.error(f"Erro ao processar dados de performance: {e}")
+    else:
+         st.info("⚠️ Faça login para visualizar o monitoramento.")
