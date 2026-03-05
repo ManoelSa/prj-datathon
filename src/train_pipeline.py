@@ -2,18 +2,18 @@ import sys
 from pathlib import Path
 import pandas as pd
 from sklearn.pipeline import Pipeline
-from sklearn.ensemble import RandomForestClassifier
 
 # Imports internos
-from src.config import DATA_PATH, FEATURE_COLS, RANDOM_STATE, MODEL_PATH, MODELS_DIR
+from src.config import DATA_PATH, FEATURE_COLS, RANDOM_STATE, MODEL_PATH, MODELS_DIR, MODEL_TYPE, MODEL_HYPERPARAMETERS
 from src.data_loader import load_data
 from src.feature_engineering import create_temporal_dataset
 from src.preprocessing import TemporalPreprocessor, DataFrameScaler
 from src.modeling import RiskModel
+from src.utils import get_model_instance
 from src.evaluation import evaluate_model, print_reliability_report
 
 def main():
-    # 1. Config basicas
+    # 1. Configurações básicas
     if not DATA_PATH.exists():
         print(f"Aviso: Arquivo não encontrado em {DATA_PATH}")
         return
@@ -43,17 +43,12 @@ def main():
     print(f"Treino: {X_train.shape}, Teste: {X_test.shape}")
     
     # 5. Construindo Pipeline
-    print("Construindo Pipeline (Preprocessor + Scaler + Model)...")
+    print("Construindo Pipeline (Pré-processador + Escalonador + Modelo)...")
     
     pipeline = Pipeline([
         ('preprocessor', TemporalPreprocessor(feature_cols=train_cols)),
         ('scaler', DataFrameScaler(feature_cols=train_cols)),
-        ('clf', RandomForestClassifier(
-            n_estimators=200, 
-            max_depth=5, 
-            class_weight='balanced', 
-            random_state=RANDOM_STATE
-        ))
+        ('clf', get_model_instance(MODEL_TYPE, MODEL_HYPERPARAMETERS[MODEL_TYPE]))
     ])
     
     # 6. Treinando modelo
