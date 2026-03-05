@@ -60,9 +60,23 @@ prj-datathon/
 
 ## 3) Instruções de Deploy (como subir o ambiente)
 
-### Pré-requisitos
-*   **Docker** e **Docker Compose** instalados.
+### Pré-requisitos Gerais
+*   **Docker** e **Docker Compose** instalados (Recomendado).
 *   (Opcional) Python 3.12 para rodar localmente sem Docker.
+
+### Configuração do Ambiente (.env) - Obrigatório para Docker e Python Local
+O projeto utiliza variáveis de ambiente para gerenciar credenciais de autenticação e URLs base de forma segura. Antes de rodar via Docker ou Localmente, você **deve** criar o arquivo `.env`.
+
+1. Na raiz do projeto, crie um arquivo chamado `.env` (ou copie o `.env.example`).
+2. Preencha com as variáveis obrigatórias (mude os valores de senha conforme desejar para seu ambiente):
+```ini
+APP_USER=admin
+APP_PASS=admin
+SECRET_KEY=sua_chave_secreta_aqui
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+API_URL=http://localhost:8000
+```
 
 ### Instalação e Execução via Docker (Recomendado)
 Suba toda a infraestrutura (API + Dashboard) com um único comando:
@@ -88,16 +102,7 @@ docker-compose up --build
     ```
 
 2.  **Variáveis de Ambiente (.env):**
-    Crie um arquivo `.env` na raiz do projeto com o seguinte conteúdo (ajuste as credenciais conforme desejado):
-    ```ini
-    APP_USER=admin
-    APP_PASS=admin
-    SECRET_KEY=sua_chave_secreta_aqui
-    ALGORITHM=HS256
-    ACCESS_TOKEN_EXPIRE_MINUTES=30
-    API_URL=http://localhost:8000
-    ```
-    *(Você pode copiar do arquivo `.env.example` incluído no repositório)*
+    *Verifique o passo "Configuração do Ambiente" acima. Este passo já deve ter sido realizado.*
 
 3.  **Instalação de Dependências:**
     Para garantir que **tanto** a API/Dashboard quanto o pacote de ML (`src`) sejam instalados corretamente:
@@ -106,10 +111,15 @@ docker-compose up --build
     pip install -e .                 # Instala o nosso pacote 'src' em modo editável
     ```
 
-4.  **Treinar e Validar o Modelo:**
+4.  **Treinar e Validar o Modelo (Opcional, porém Recomendado):**
+    > 💡 **Nota sobre o Modelo Pré-Treinado:**
+    > O repositório já inclui um modelo validado em `app/models/risk_model.joblib`. Portanto, você **não é obrigado** a treinar o modelo para subir a API e o Dashboard.
+    > No entanto, o projeto possui um motor de configuração dinâmica! Você pode testar diferentes algoritmos (Random Forest, Logistic Regression, Gradient Boosting) e hiperparâmetros editando o arquivo `src/config.py`.
+
+    Para re-treinar o modelo com suas próprias configurações:
     ```bash
     python src/train_pipeline.py
-    # Output: Modelo salvo em app/models/risk_model.joblib e Relatório de Confiabilidade gerado.
+    # Output: Novo modelo salvo em app/models/risk_model.joblib e Relatório de Confiabilidade gerado no terminal.
     ```
 
 5.  **Rodar a API:**
